@@ -55,22 +55,20 @@ const add = async function (context) {
     after: `from 'redux'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `\n\n/* ------------- AutoRehydrate Enhancer ------------- */
+    insert: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
 
   // add the autoRehydrate enhancer
   if (ReduxPersist.active) {
     enhancers.push(autoRehydrate())
-  }
-`,
-    after: `enhancers.push(applyMiddleware(...middleware))`
+  }`,
+    after: `applyMiddleware\(.+middleware\)`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     insert: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     RehydrationServices.updateReducers(store)
-  }
-`,
+  }`,
     after: `const store`
   })
 }
@@ -116,21 +114,19 @@ const remove = async function (context) {
     delete: `import { autoRehydrate } from 'redux-persist'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `\n\n/* ------------- AutoRehydrate Enhancer ------------- */
+    delete: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
 
   // add the autoRehydrate enhancer
   if (ReduxPersist.active) {
     enhancers.push(autoRehydrate())
-  }
-`
+  }\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     delete: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     RehydrationServices.updateReducers(store)
-  }
-`
+  }\n`
   })
 }
 
