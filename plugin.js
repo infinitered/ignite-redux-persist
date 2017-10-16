@@ -62,7 +62,7 @@ const add = async function (context) {
     enhancers.push(autoRehydrate())
   }
 `,
-    after: `enhancers.push(applyMiddleware`
+    after: `enhancers.push(applyMiddleware(...middleware))`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     insert: `
