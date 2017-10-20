@@ -37,7 +37,7 @@ const add = async function (context) {
   if (!filesystem.exists(`${APP_PATH}/Config/ReduxPersist.js`)) {
     filesystem.copy(
       `${PLUGIN_PATH}/templates/ReduxPersist.js`,
-      `${APP_PATH}/Config/ReduxPersist.js`
+      `${APP_PATH}/App/Config/ReduxPersist.js`
     )
   }
 
@@ -101,7 +101,7 @@ const remove = async function (context) {
     'Do you want to remove Config/ReduxPersist.js?'
   )
   if (removeConfig) {
-    filesystem.remove(`${APP_PATH}/Config/ReduxPersist.js`)
+    filesystem.remove(`${APP_PATH}/App/Config/ReduxPersist.js`)
   }
 
   // remove immutable persistence transform service
