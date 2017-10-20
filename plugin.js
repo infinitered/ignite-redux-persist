@@ -17,14 +17,6 @@ const add = async function (context) {
   await ignite.addModule('ramda')
   await ignite.addModule('seamless-immutable')
 
-  // add config
-  if (!filesystem.exists(`${APP_PATH}/Config/ReduxPersist.js`)) {
-    filesystem.copy(
-      `${PLUGIN_PATH}/templates/ReduxPersist.js`,
-      `${APP_PATH}/Config/ReduxPersist.js`
-    )
-  }
-
   // add immutable persistence transform service
   if (!filesystem.exists(`${APP_PATH}/App/Services/ImmutablePersistenceTransform.js`)) {
     filesystem.copy(
@@ -38,6 +30,14 @@ const add = async function (context) {
     filesystem.copy(
       `${PLUGIN_PATH}/templates/Rehydration.js`,
       `${APP_PATH}/App/Services/Rehydration.js`
+    )
+  }
+
+  // add config
+  if (!filesystem.exists(`${APP_PATH}/Config/ReduxPersist.js`)) {
+    filesystem.copy(
+      `${PLUGIN_PATH}/templates/ReduxPersist.js`,
+      `${APP_PATH}/Config/ReduxPersist.js`
     )
   }
 
@@ -70,6 +70,23 @@ const add = async function (context) {
     Rehydration.updateReducers(store)
   }`,
     after: `const store`
+  })
+
+  // patch RootContainer.js
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    insert: `import ReduxPersist from '../Config/ReduxPersist'`,
+    after: `from '../Redux/StartupRedux'`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    insert: `  componentDidMount () {
+    // if redux persist is not active fire startup action
+    if (!ReduxPersist.active) {
+      this.props.startup()
+    }
+  }`,
+    replace: `  componentDidMount () {
+    this.props.startup()
+  }`
   })
 }
 
@@ -127,6 +144,22 @@ const remove = async function (context) {
   if (ReduxPersist.active) {
     Rehydration.updateReducers(store)
   }\n`
+  })
+
+  // unpatch RootContainer.js
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    delete: `import ReduxPersist from '../Config/ReduxPersist'\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    replace: `  componentDidMount () {
+    // if redux persist is not active fire startup action
+    if (!ReduxPersist.active) {
+      this.props.startup()
+    }
+  }`,
+    insert: `  componentDidMount () {
+    this.props.startup()
+  }`
   })
 }
 
