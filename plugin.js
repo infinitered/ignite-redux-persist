@@ -47,7 +47,7 @@ const add = async function (context) {
     after: `from 'redux'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `import RehydrationServices from '../Services/RehydrationServices'`,
+    insert: `import Rehydration from '../Services/Rehydration'`,
     after: `from 'redux'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
@@ -67,7 +67,7 @@ const add = async function (context) {
     insert: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
-    RehydrationServices.updateReducers(store)
+    Rehydration.updateReducers(store)
   }`,
     after: `const store`
   })
@@ -108,7 +108,7 @@ const remove = async function (context) {
     delete: `import ReduxPersist from '../Config/ReduxPersist'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `import RehydrationServices from '../Services/RehydrationServices'\n`
+    delete: `import Rehydration from '../Services/Rehydration'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     delete: `import { autoRehydrate } from 'redux-persist'\n`
@@ -125,7 +125,7 @@ const remove = async function (context) {
     delete: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
-    RehydrationServices.updateReducers(store)
+    Rehydration.updateReducers(store)
   }\n`
   })
 }
