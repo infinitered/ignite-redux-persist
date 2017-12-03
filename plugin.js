@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 
 const NPM_MODULE_NAME = 'redux-persist'
-const NPM_MODULE_VERSION = '^4.1.0'
+const NPM_MODULE_VERSION = '^5.4.0'
 
 const PLUGIN_PATH = __dirname
 const APP_PATH = process.cwd()
