@@ -70,12 +70,17 @@ const add = async function (context) {
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     insert: `
-    // if rehydration is active use persistReducer otherwise use default output from combineReducers
-    if(ReduxPersist.active) {
+    let finalReducers = reducers
+    // If rehydration is on use persistReducer otherwise default combineReducers
+    if (ReduxPersist.active) {
       const persistConfig = ReduxPersist.storeConfig
-      reducers = persistReducer(persistConfig, reducers)
+      finalReducers = persistReducer(persistConfig, reducers)
     }`,
     after: `export const reducers`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    replace: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`,
+    insert: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`
   })
 
   // patch RootContainer.js
@@ -150,11 +155,16 @@ const remove = async function (context) {
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     delete: `
-    // if rehydration is active use persistReducer otherwise use default output from combineReducers
-    if(ReduxPersist.active) {
+    let finalReducers = reducers
+    // If rehydration is on use persistReducer otherwise default combineReducers
+    if (ReduxPersist.active) {
       const persistConfig = ReduxPersist.storeConfig
-      reducers = persistReducer(persistConfig, reducers)
+      finalReducers = persistReducer(persistConfig, reducers)
     }\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+    replace: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`,
+    insert: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`
   })
 
   // unpatch RootContainer.js
