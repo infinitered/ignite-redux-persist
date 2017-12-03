@@ -51,25 +51,31 @@ const add = async function (context) {
     after: `from 'redux'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `import { autoRehydrate } from 'redux-persist'`,
-    after: `from 'redux'`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
-
-  // add the autoRehydrate enhancer
-  if (ReduxPersist.active) {
-    enhancers.push(autoRehydrate())
-  }`,
-    after: `applyMiddleware\(.+middleware\)`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     insert: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     Rehydration.updateReducers(store)
   }`,
     after: `const store`
+  })
+
+  // patch Redux/index.js
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `import { persistReducer } from 'redux-persist'`,
+    after: `from 'redux'`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `import ReduxPersist from '../Config/ReduxPersist'`,
+    after: `from '../Sagas/'`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `
+    // if rehydration is active use persistReducer otherwise use default output from combineReducers
+    if(ReduxPersist.active) {
+      const persistConfig = ReduxPersist.storeConfig
+      reducers = persistReducer(persistConfig, reducers)
+    }`,
+    after: `export const reducers`
   })
 
   // patch RootContainer.js
@@ -128,22 +134,27 @@ const remove = async function (context) {
     delete: `import Rehydration from '../Services/Rehydration'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `import { autoRehydrate } from 'redux-persist'\n`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
-
-  // add the autoRehydrate enhancer
-  if (ReduxPersist.active) {
-    enhancers.push(autoRehydrate())
-  }\n`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     delete: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     Rehydration.updateReducers(store)
   }\n`
+  })
+
+  // unpatch Redux/index.js
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `import { persistReducer } from 'redux-persist'\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `import ReduxPersist from '../Config/ReduxPersist'\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `
+    // if rehydration is active use persistReducer otherwise use default output from combineReducers
+    if(ReduxPersist.active) {
+      const persistConfig = ReduxPersist.storeConfig
+      reducers = persistReducer(persistConfig, reducers)
+    }\n`
   })
 
   // unpatch RootContainer.js
