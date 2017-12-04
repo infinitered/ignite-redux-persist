@@ -76,7 +76,7 @@ const add = async function (context) {
       const persistConfig = ReduxPersist.storeConfig
       finalReducers = persistReducer(persistConfig, reducers)
     }`,
-    after: `export const reducers`
+    after: `export default`
   })
   ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
     replace: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`,
