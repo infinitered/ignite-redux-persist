@@ -70,15 +70,15 @@ const add = async function (context) {
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     insert: `
-    let finalReducers = reducers
-    // If rehydration is on use persistReducer otherwise default combineReducers
-    if (ReduxPersist.active) {
-      const persistConfig = ReduxPersist.storeConfig
-      finalReducers = persistReducer(persistConfig, reducers)
-    }`,
+  let finalReducers = reducers
+  // If rehydration is on use persistReducer otherwise default combineReducers
+  if (ReduxPersist.active) {
+    const persistConfig = ReduxPersist.storeConfig
+    finalReducers = persistReducer(persistConfig, reducers)
+  }`,
     after: `export default`
   })
-  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     replace: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`,
     insert: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`
   })
@@ -155,14 +155,14 @@ const remove = async function (context) {
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     delete: `
-    let finalReducers = reducers
-    // If rehydration is on use persistReducer otherwise default combineReducers
-    if (ReduxPersist.active) {
-      const persistConfig = ReduxPersist.storeConfig
-      finalReducers = persistReducer(persistConfig, reducers)
-    }\n`
+  let finalReducers = reducers
+  // If rehydration is on use persistReducer otherwise default combineReducers
+  if (ReduxPersist.active) {
+    const persistConfig = ReduxPersist.storeConfig
+    finalReducers = persistReducer(persistConfig, reducers)
+  }\n`
   })
-  ignite.patchInFile(`${APP_PATH}/App/Containers/RootContainer.js`, {
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
     replace: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`,
     insert: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`
   })
