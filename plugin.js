@@ -2,7 +2,7 @@
 // ----------------------------------------------------------------------------
 
 const NPM_MODULE_NAME = 'redux-persist'
-const NPM_MODULE_VERSION = '^4.1.0'
+const NPM_MODULE_VERSION = '^5.4.0'
 
 const PLUGIN_PATH = __dirname
 const APP_PATH = process.cwd()
@@ -51,25 +51,36 @@ const add = async function (context) {
     after: `from 'redux'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `import { autoRehydrate } from 'redux-persist'`,
-    after: `from 'redux'`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    insert: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
-
-  // add the autoRehydrate enhancer
-  if (ReduxPersist.active) {
-    enhancers.push(autoRehydrate())
-  }`,
-    after: `applyMiddleware\(.+middleware\)`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     insert: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     Rehydration.updateReducers(store)
   }`,
     after: `const store`
+  })
+
+  // patch Redux/index.js
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `import { persistReducer } from 'redux-persist'`,
+    after: `from 'redux'`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `import ReduxPersist from '../Config/ReduxPersist'`,
+    after: `from '../Sagas/'`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    insert: `
+  let finalReducers = reducers
+  // If rehydration is on use persistReducer otherwise default combineReducers
+  if (ReduxPersist.active) {
+    const persistConfig = ReduxPersist.storeConfig
+    finalReducers = persistReducer(persistConfig, reducers)
+  }`,
+    after: `export default`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    replace: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`,
+    insert: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`
   })
 
   // patch RootContainer.js
@@ -128,22 +139,32 @@ const remove = async function (context) {
     delete: `import Rehydration from '../Services/Rehydration'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `import { autoRehydrate } from 'redux-persist'\n`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
-    delete: `\n  /* ------------- AutoRehydrate Enhancer ------------- */
-
-  // add the autoRehydrate enhancer
-  if (ReduxPersist.active) {
-    enhancers.push(autoRehydrate())
-  }\n`
-  })
-  ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     delete: `
   // configure persistStore and check reducer version number
   if (ReduxPersist.active) {
     Rehydration.updateReducers(store)
   }\n`
+  })
+
+  // unpatch Redux/index.js
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `import { persistReducer } from 'redux-persist'\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `import ReduxPersist from '../Config/ReduxPersist'\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    delete: `
+  let finalReducers = reducers
+  // If rehydration is on use persistReducer otherwise default combineReducers
+  if (ReduxPersist.active) {
+    const persistConfig = ReduxPersist.storeConfig
+    finalReducers = persistReducer(persistConfig, reducers)
+  }\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    replace: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`,
+    insert: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`
   })
 
   // unpatch RootContainer.js
