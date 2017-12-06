@@ -1,7 +1,7 @@
 {
   "name": "ignite-redux-persist",
   "description": "An ignite plugin for redux-persist.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "MIT",
   "author": {
     "name": "Ryan Linton",
