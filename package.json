@@ -1,12 +1,12 @@
 {
   "name": "ignite-redux-persist",
-  "description": "A description of your plugin.",
-  "version": "0.1.0",
+  "description": "An ignite plugin for redux-persist.",
+  "version": "1.0.1",
   "license": "MIT",
   "author": {
-    "name": "Your Name",
-    "email": "test@example.com",
-    "url": "https://example.com/path/to/your/plugin"
+    "name": "Ryan Linton",
+    "email": "ryan@infinite.red",
+    "url": "https://github.com/infinitered/ignite-redux-persist"
   },
   "scripts": {
     "lint": "standard",
@@ -18,8 +18,8 @@
   "standard": {
     "parser": "babel-eslint"
   },
-  "url": "https://example.com/path/to/your/plugin",
-  "repository": "githuborg/reponame",
+  "url": "https://github.com/infinitered/ignite-redux-persist",
+  "repository": "infinitered/ignite-redux-persist",
   "devDependencies": {
     "ava": "^0.18.2",
     "babel-eslint": "^7.1.1",

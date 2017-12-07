@@ -69,13 +69,12 @@ const add = async function (context) {
     after: `from '../Sagas/'`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
-    insert: `
-  let finalReducers = reducers
+    insert: `  let finalReducers = reducers
   // If rehydration is on use persistReducer otherwise default combineReducers
   if (ReduxPersist.active) {
     const persistConfig = ReduxPersist.storeConfig
     finalReducers = persistReducer(persistConfig, reducers)
-  }`,
+  }\n`,
     after: `export default`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
@@ -140,10 +139,16 @@ const remove = async function (context) {
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/CreateStore.js`, {
     delete: `
-  // configure persistStore and check reducer version number
+  let finalReducers = reducers
+  // If rehydration is on use persistReducer otherwise default combineReducers
   if (ReduxPersist.active) {
-    Rehydration.updateReducers(store)
+    const persistConfig = ReduxPersist.storeConfig
+    finalReducers = persistReducer(persistConfig, reducers)
   }\n`
+  })
+  ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
+    replace: `let { store, sagasManager, sagaMiddleware } = configureStore(finalReducers, rootSaga)`,
+    insert: `let { store, sagasManager, sagaMiddleware } = configureStore(reducers, rootSaga)`
   })
 
   // unpatch Redux/index.js
@@ -154,8 +159,7 @@ const remove = async function (context) {
     delete: `import ReduxPersist from '../Config/ReduxPersist'\n`
   })
   ignite.patchInFile(`${APP_PATH}/App/Redux/index.js`, {
-    delete: `
-  let finalReducers = reducers
+    delete: `  let finalReducers = reducers
   // If rehydration is on use persistReducer otherwise default combineReducers
   if (ReduxPersist.active) {
     const persistConfig = ReduxPersist.storeConfig
