@@ -2,12 +2,12 @@
 // ----------------------------------------------------------------------------
 
 const NPM_MODULE_NAME = 'redux-persist'
-const NPM_MODULE_VERSION = '^5.4.0'
+const NPM_MODULE_VERSION = '^5.10.0'
 
 const PLUGIN_PATH = __dirname
 const APP_PATH = process.cwd()
 
-const add = async function (context) {
+const add = async function(context) {
   const { ignite, filesystem } = context
 
   // install an NPM module and link it
@@ -100,16 +100,14 @@ const add = async function (context) {
   })
 }
 
-const remove = async function (context) {
+const remove = async function(context) {
   const { ignite, filesystem } = context
 
   // remove the npm module
   await ignite.removeModule(NPM_MODULE_NAME)
 
   // remove immutable persistence transform service
-  const removeConfig = await context.prompt.confirm(
-    'Do you want to remove Config/ReduxPersist.js?'
-  )
+  const removeConfig = await context.prompt.confirm('Do you want to remove Config/ReduxPersist.js?')
   if (removeConfig) {
     filesystem.remove(`${APP_PATH}/App/Config/ReduxPersist.js`)
   }
