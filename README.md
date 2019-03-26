@@ -1,6 +1,6 @@
 # Ignite Redux Persist Plugin
 
-This plugin adds support for redux-persist.
+This plugin adds support for redux-persist to an [Ignite Andross](https://github.com/infinitered/ignite-andross) project.
 
 ## Install
 
